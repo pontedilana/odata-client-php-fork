@@ -29,6 +29,7 @@ class Constants
     const ODATA_ID = '@odata.id';
     const ODATA_NEXT_LINK = '@odata.id';
     const ODATA_VALUE = 'value';
+    const ODATA_CONTEXT = '@odata.context';
 
     // Default ODATA Paging
     const ODATA_MAX_PAGE_SIZE = 'odata.maxpagesize';

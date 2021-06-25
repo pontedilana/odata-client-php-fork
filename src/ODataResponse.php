@@ -17,6 +17,8 @@
 
 namespace SaintSystems\OData;
 
+use function json_decode;
+
 /**
  * Class ODataResponse
  *
@@ -131,23 +133,32 @@ class ODataResponse
     *
     * @param mixed $returnType The type to convert the object(s) to
     *
-    * @return mixed object or array of objects of type $returnType
+    * @return array<object> object or array of objects of type $returnType
     */
-    public function getResponseAsObject($returnType)
+    public function getResponseAsObject($returnType): array
     {
         $class = $returnType;
         $result = $this->getBody();
 
         //If more than one object is returned
         if (array_key_exists(Constants::ODATA_VALUE, $result)) {
-            $objArray = array();
-            foreach ($result[Constants::ODATA_VALUE] as $obj) {
+            $objArray = [];
+            $odataValue = $result[Constants::ODATA_VALUE];
+
+            if (
+                array_key_exists(Constants::ODATA_CONTEXT, $result)
+                && str_ends_with($result[Constants::ODATA_CONTEXT], '#Edm.String')
+            ) {
+                $odataValue = \json_decode($odataValue, true, 512, JSON_THROW_ON_ERROR);
+            }
+
+            foreach ($odataValue as $obj) {
                 $objArray[] = new $class($obj);
             }
             return $objArray;
-        } else {
-            return [new $class($result)];
         }
+
+        return [new $class($result)];
     }
 
     /**
@@ -177,8 +188,7 @@ class ODataResponse
     public function getId()
     {
         if (array_key_exists(Constants::ODATA_ID, $this->getHeaders())) {
-            $id = $this->getBody()[Constants::ODATA_ID];
-            return $id;
+            return $this->getBody()[Constants::ODATA_ID];
         }
         return null;
     }
