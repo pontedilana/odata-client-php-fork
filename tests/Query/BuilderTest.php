@@ -2,20 +2,19 @@
 
 namespace SaintSystems\OData\Query\Tests;
 
-use PHPUnit\Framework\TestCase;
-
 use Illuminate\Support\Collection;
-use SaintSystems\OData\ODataClient;
-use SaintSystems\OData\QueryOptions;
-use SaintSystems\OData\Query\Builder;
+use PHPUnit\Framework\TestCase;
 use SaintSystems\OData\Exception\ODataQueryException;
+use SaintSystems\OData\ODataClient;
+use SaintSystems\OData\Query\Builder;
+use SaintSystems\OData\QueryOptions;
 
 class BuilderTest extends TestCase
 {
     protected $baseUrl;
     protected $client;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->baseUrl = 'https://services.odata.org/V4/TripPinService';
         $this->client = new ODataClient($this->baseUrl);
@@ -70,7 +69,7 @@ class BuilderTest extends TestCase
 
         $builder->whereKey('russellwhyte');
 
-        $expected = $entitySet.'(\'russellwhyte\')';
+        $expected = $entitySet . '(\'russellwhyte\')';
         $actual = $builder->toRequest();
 
         $this->assertEquals($expected, $actual);
@@ -86,7 +85,7 @@ class BuilderTest extends TestCase
 
         $builder->whereKey(12345);
 
-        $expected = $entitySet.'(12345)';
+        $expected = $entitySet . '(12345)';
         $actual = $builder->toRequest();
 
         $this->assertEquals($expected, $actual);
@@ -98,9 +97,9 @@ class BuilderTest extends TestCase
 
         $entitySet = 'People';
 
-        $builder->select('FirstName','LastName')->from($entitySet);
+        $builder->select('FirstName', 'LastName')->from($entitySet);
 
-        $expected = $entitySet.'?$select=FirstName,LastName';
+        $expected = $entitySet . '?$select=FirstName,LastName';
 
         $request = $builder->toRequest();
 
@@ -157,11 +156,11 @@ class BuilderTest extends TestCase
 
         $entitySet = 'People';
 
-        $people = $builder->from($entitySet)->where('FirstName','Russell')->get();
+        $people = $builder->from($entitySet)->where('FirstName', 'Russell')->get();
 
         // dd($people);
         $this->assertTrue(is_array($people->toArray()));
-        $this->assertTrue($people->count() == 1);
+        $this->assertTrue(1 == $people->count());
         //$this->assertInstanceOf(Collection::class, $people);
         //$this->assertEquals($expected, $request);
     }
@@ -172,11 +171,11 @@ class BuilderTest extends TestCase
 
         $entitySet = 'People';
 
-        $people = $builder->from($entitySet)->where('FirstName','Russell')->orWhere('LastName','Ketchum')->get();
+        $people = $builder->from($entitySet)->where('FirstName', 'Russell')->orWhere('LastName', 'Ketchum')->get();
 
         //dd($people);
         $this->assertTrue(is_array($people->toArray()));
-        $this->assertTrue($people->count() == 2);
+        $this->assertTrue(2 == $people->count());
         //$this->assertInstanceOf(Collection::class, $people);
         //$this->assertEquals($expected, $request);
     }
@@ -187,14 +186,14 @@ class BuilderTest extends TestCase
 
         $entitySet = 'People';
 
-        $people = $builder->from($entitySet)->where('FirstName','Russell')->orWhere(function($query) {
-            $query->where('LastName','Ketchum')
-                  ->where('FirstName','Scott');
+        $people = $builder->from($entitySet)->where('FirstName', 'Russell')->orWhere(function ($query) {
+            $query->where('LastName', 'Ketchum')
+                  ->where('FirstName', 'Scott');
         })->get();
 
         //dd($people);
         $this->assertTrue(is_array($people->toArray()));
-        $this->assertTrue($people->count() == 2);
+        $this->assertTrue(2 == $people->count());
         //$this->assertInstanceOf(Collection::class, $people);
         //$this->assertEquals($expected, $request);
     }
@@ -372,7 +371,7 @@ class BuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
 
-        $builder->order(array(['Id', 'asc'], ['Name', 'desc']));
+        $builder->order([['Id', 'asc'], ['Name', 'desc']]);
 
         $expectedUri = '$orderby=Id asc,Name desc';
         $actualUri = $builder->toRequest();
@@ -408,7 +407,7 @@ class BuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
 
-        $builder->order(array(['column' => 'Id', 'direction' => 'asc'], ['column' => 'Name', 'direction' => 'desc']));
+        $builder->order([['column' => 'Id', 'direction' => 'asc'], ['column' => 'Name', 'direction' => 'desc']]);
 
         $expectedUri = '$orderby=Id asc,Name desc';
         $actualUri = $builder->toRequest();
@@ -602,9 +601,9 @@ class BuilderTest extends TestCase
         $entitySet = 'People';
 
         $builder->from($entitySet)
-            ->where(function($query) {
-                $query->where('FirstName','Russell');
-                $query->where('LastName','Whyte');
+            ->where(function ($query) {
+                $query->where('FirstName', 'Russell');
+                $query->where('LastName', 'Whyte');
             });
 
         $expectedUri = 'People?$filter=(FirstName eq \'Russell\' and LastName eq \'Whyte\')';
@@ -621,9 +620,9 @@ class BuilderTest extends TestCase
 
         $builder->from($entitySet)
             ->select('Name')
-            ->where(function($query) {
-                $query->where('FirstName','Russell');
-                $query->where('LastName','Whyte');
+            ->where(function ($query) {
+                $query->where('FirstName', 'Russell');
+                $query->where('LastName', 'Whyte');
             });
 
         $expectedUri = 'People?$select=Name&$filter=(FirstName eq \'Russell\' and LastName eq \'Whyte\')';
@@ -631,5 +630,4 @@ class BuilderTest extends TestCase
 
         $this->assertEquals($expectedUri, $actualUri);
     }
-
 }

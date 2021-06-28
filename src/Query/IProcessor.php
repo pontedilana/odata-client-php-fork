@@ -9,7 +9,6 @@ interface IProcessor
     /**
      * Process the results of a "select" query.
      *
-     * @param Builder       $query
      * @param IODataRequest $results
      *
      * @return IODataRequest

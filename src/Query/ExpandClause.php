@@ -7,7 +7,7 @@ use Closure;
 class ExpandClause extends Builder
 {
     /**
-     * The property to be expanded
+     * The property to be expanded.
      *
      * @var string
      */
@@ -23,8 +23,7 @@ class ExpandClause extends Builder
     /**
      * Create a new expand clause instance.
      *
-     * @param Builder $parentQuery
-     * @param string  $property
+     * @param string $property
      */
     public function __construct(Builder $parentQuery, $property)
     {

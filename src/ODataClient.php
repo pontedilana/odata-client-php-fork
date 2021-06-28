@@ -13,19 +13,22 @@ use SaintSystems\OData\Query\Processor;
 class ODataClient implements IODataClient
 {
     /**
-     * The base service URL. For example, "https://services.odata.org/V4/TripPinService/"
+     * The base service URL. For example, "https://services.odata.org/V4/TripPinService/".
+     *
      * @var string
      */
     private $baseUrl;
 
     /**
      * The IAuthenticationProvider for authenticating request messages.
+     *
      * @var IAuthenticationProvider
      */
     private $authenticationProvider;
 
     /**
      * The IHttpProvider for sending HTTP requests.
+     *
      * @var IHttpProvider
      */
     private $httpProvider;
@@ -45,7 +48,7 @@ class ODataClient implements IODataClient
     protected $postProcessor;
 
     /**
-     * The return type for the entities
+     * The return type for the entities.
      *
      * @var string
      */
@@ -53,13 +56,14 @@ class ODataClient implements IODataClient
 
     /**
      * Constructs a new ODataClient.
-     * @param string                  $baseUrl                The base service URL.
-     * @param IAuthenticationProvider $authenticationProvider The IAuthenticationProvider for authenticating request messages.
-     * @param IHttpProvider|null      $httpProvider           The IHttpProvider for sending requests.
+     *
+     * @param string                  $baseUrl                the base service URL
+     * @param IAuthenticationProvider $authenticationProvider the IAuthenticationProvider for authenticating request messages
+     * @param IHttpProvider|null      $httpProvider           the IHttpProvider for sending requests
      */
     public function __construct(
         $baseUrl,
-        Callable $authenticationProvider = null,
+        callable $authenticationProvider = null,
         IHttpProvider $httpProvider = null
     ) {
         $this->setBaseUrl($baseUrl);
@@ -91,7 +95,7 @@ class ODataClient implements IODataClient
      */
     protected function getDefaultQueryGrammar()
     {
-        return new Grammar;
+        return new Grammar();
     }
 
     /**
@@ -116,6 +120,7 @@ class ODataClient implements IODataClient
 
     /**
      * Gets the IAuthenticationProvider for authenticating requests.
+     *
      * @var IAuthenticationProvider
      *
      * @return Closure|IAuthenticationProvider
@@ -137,7 +142,6 @@ class ODataClient implements IODataClient
 
     /**
      * Sets the base URL for requests of the client.
-     * @param mixed $value
      *
      * @throws ODataException
      */
@@ -161,7 +165,7 @@ class ODataClient implements IODataClient
     }
 
     /**
-     * Begin a fluent query against an odata service
+     * Begin a fluent query against an odata service.
      *
      * @param string $entitySet
      *
@@ -173,7 +177,7 @@ class ODataClient implements IODataClient
     }
 
     /**
-     * Begin a fluent query against an odata service
+     * Begin a fluent query against an odata service.
      *
      * @param array $properties
      *
@@ -215,7 +219,6 @@ class ODataClient implements IODataClient
      * Run a POST request against the service.
      *
      * @param string $requestUri
-     * @param mixed  $postData
      *
      * @return IODataRequest
      */
@@ -228,7 +231,6 @@ class ODataClient implements IODataClient
      * Run a PATCH request against the service.
      *
      * @param string $requestUri
-     * @param mixed  $body
      *
      * @return IODataRequest
      */
@@ -250,11 +252,10 @@ class ODataClient implements IODataClient
     }
 
     /**
-     * Return an ODataRequest
+     * Return an ODataRequest.
      *
      * @param string $method
      * @param string $requestUri
-     * @param mixed  $body
      *
      * @return IODataRequest
      *
@@ -262,7 +263,7 @@ class ODataClient implements IODataClient
      */
     public function request($method, $requestUri, $body = null)
     {
-        $request = new ODataRequest($method, $this->baseUrl.$requestUri, $this, $this->entityReturnType);
+        $request = new ODataRequest($method, $this->baseUrl . $requestUri, $this, $this->entityReturnType);
 
         if ($body) {
             $request->attachBody($body);
@@ -291,8 +292,6 @@ class ODataClient implements IODataClient
     /**
      * Set the query grammar used by the connection.
      *
-     * @param  IGrammar  $grammar
-     *
      * @return void
      */
     public function setQueryGrammar(IGrammar $grammar)
@@ -313,8 +312,6 @@ class ODataClient implements IODataClient
     /**
      * Set the query post processor used by the connection.
      *
-     * @param IProcessor $processor
-     *
      * @return void
      */
     public function setPostProcessor(IProcessor $processor)
@@ -323,7 +320,7 @@ class ODataClient implements IODataClient
     }
 
     /**
-     * Set the entity return type
+     * Set the entity return type.
      *
      * @param string $entityReturnType
      */

@@ -5,9 +5,7 @@ namespace SaintSystems\OData\Query;
 interface IGrammar
 {
     /**
-     * Compile a select query into OData Uri
-     *
-     * @param Builder $query
+     * Compile a select query into OData Uri.
      *
      * @return string
      */
@@ -37,8 +35,6 @@ interface IGrammar
     /**
      * Prepare the appropriate URI value for a where value.
      *
-     * @param mixed $value
-     *
      * @return string
      */
     public function prepareValue($value);
@@ -46,16 +42,12 @@ interface IGrammar
     /**
      * Get the appropriate query parameter place-holder for a value.
      *
-     * @param mixed $value
-     *
      * @return string
      */
     public function parameter($value);
 
     /**
      * Determine if the given value is a raw expression.
-     *
-     * @param mixed $value
      *
      * @return bool
      */
@@ -72,8 +64,6 @@ interface IGrammar
 
     /**
      * Convert an array of property names into a delimited string.
-     *
-     * @param array $properties
      *
      * @return string
      */

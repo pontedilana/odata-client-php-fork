@@ -3,14 +3,13 @@
 namespace SaintSystems\OData\Tests;
 
 use PHPUnit\Framework\TestCase;
-
 use SaintSystems\OData\ODataClient;
 
 class ODataClientTest extends TestCase
 {
     private $baseUrl;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->baseUrl = 'http://services.odata.org/V4/TripPinService';
     }
@@ -36,7 +35,7 @@ class ODataClientTest extends TestCase
     {
         $odataClient = new ODataClient($this->baseUrl);
         $this->assertNotNull($odataClient);
-        $people = $odataClient->select('FirstName','LastName')->from('People')->get();
+        $people = $odataClient->select('FirstName', 'LastName')->from('People')->get();
         //dd($people);
         $this->assertTrue(is_array($people->toArray()));
     }
@@ -45,10 +44,10 @@ class ODataClientTest extends TestCase
     {
         $odataClient = new ODataClient($this->baseUrl);
         $this->assertNotNull($odataClient);
-        $people = $odataClient->from('People')->where('FirstName','Russell')->get();
+        $people = $odataClient->from('People')->where('FirstName', 'Russell')->get();
         // dd($people);
         $this->assertTrue(is_array($people->toArray()));
-        $this->assertTrue($people->count() == 1);
+        $this->assertTrue(1 == $people->count());
     }
 
     public function testODataClientFromQueryWithWhereOrWhere()
@@ -56,12 +55,12 @@ class ODataClientTest extends TestCase
         $odataClient = new ODataClient($this->baseUrl);
         $this->assertNotNull($odataClient);
         $people = $odataClient->from('People')
-                              ->where('FirstName','Russell')
-                              ->orWhere('LastName','Ketchum')
+                              ->where('FirstName', 'Russell')
+                              ->orWhere('LastName', 'Ketchum')
                               ->get();
         // dd($people);
         $this->assertTrue(is_array($people->toArray()));
-        $this->assertTrue($people->count() == 2);
+        $this->assertTrue(2 == $people->count());
     }
 
     public function testODataClientFind()

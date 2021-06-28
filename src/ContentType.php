@@ -6,9 +6,9 @@ use SaintSystems\OData\Core\Enum;
 
 class ContentType extends Enum
 {
-    const APPLICATION_JSON = 'application/json';
+    public const APPLICATION_JSON = 'application/json';
 
-    const APPLICATION_XML = 'application/xml';
+    public const APPLICATION_XML = 'application/xml';
 
     public function __toString()
     {

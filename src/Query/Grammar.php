@@ -10,7 +10,7 @@ class Grammar implements IGrammar
      * @var array
      */
     protected $operators = [
-        '=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!='
+        '=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!=',
     ];
 
     /**
@@ -19,13 +19,13 @@ class Grammar implements IGrammar
      * @var array
      */
     protected $functions = [
-        'contains', 'startswith', 'endswith', 'substringof'
+        'contains', 'startswith', 'endswith', 'substringof',
     ];
 
     protected $operatorMapping = [
-        '='  => 'eq',
-        '<'  => 'lt',
-        '>'  => 'gt',
+        '=' => 'eq',
+        '<' => 'lt',
+        '>' => 'gt',
         '<=' => 'le',
         '>=' => 'ge',
         '!<' => 'not lt',
@@ -55,14 +55,14 @@ class Grammar implements IGrammar
     ];
 
     /**
-     * Determine if query param is the first one added to uri
+     * Determine if query param is the first one added to uri.
      *
      * @var bool
      */
     private $isFirstQueryParam = true;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function compileSelect(Builder $query)
     {
@@ -71,7 +71,7 @@ class Grammar implements IGrammar
         // can build the query and concatenate all the pieces together as one.
         $original = $query->properties;
 
-        if (is_null($query->properties)) {
+        if (null === $query->properties) {
             $query->properties = [];
         }
 
@@ -92,8 +92,6 @@ class Grammar implements IGrammar
     /**
      * Compile the components necessary for a select clause.
      *
-     * @param Builder $query
-     *
      * @return array
      */
     protected function compileComponents(Builder $query)
@@ -104,20 +102,20 @@ class Grammar implements IGrammar
             // To compile the query, we'll spin through each component of the query and
             // see if that component exists. If it does we'll just call the compiler
             // function for the component which is responsible for making the SQL.
-            if (! is_null($query->$component)) {
-                $method = 'compile'.ucfirst($component);
+            if (null !== $query->$component) {
+                $method = 'compile' . ucfirst($component);
 
                 $uri[$component] = $this->$method($query, $query->$component);
             }
         }
+
         return $uri;
     }
 
     /**
      * Compile the "from" portion of the query.
      *
-     * @param Builder $query
-     * @param string  $entitySet
+     * @param string $entitySet
      *
      * @return string
      */
@@ -129,14 +127,13 @@ class Grammar implements IGrammar
     /**
      * Compile the entity key portion of the query.
      *
-     * @param Builder $query
-     * @param string  $entityKey
+     * @param string $entityKey
      *
      * @return string
      */
     protected function compileEntityKey(Builder $query, $entityKey)
     {
-        if (is_null($entityKey)) {
+        if (null === $entityKey) {
             return '';
         }
 
@@ -151,9 +148,6 @@ class Grammar implements IGrammar
 
     /**
      * Compile the composite entity key portion of the query.
-     *
-     * @param Builder $query
-     * @param mixed   $entityKey
      *
      * @return string
      */
@@ -180,6 +174,7 @@ class Grammar implements IGrammar
             )) {
             return $queryString;
         }
+
         return '';
     }
 
@@ -188,14 +183,14 @@ class Grammar implements IGrammar
         if (is_uuid($entityKey) || is_int($entityKey)) {
             return $entityKey;
         }
+
         return "'$entityKey'";
     }
 
     /**
      * Compile an aggregated select clause.
      *
-     * @param Builder $query
-     * @param array   $aggregate
+     * @param array $aggregate
      *
      * @return string
      */
@@ -207,8 +202,7 @@ class Grammar implements IGrammar
     /**
      * Compile the "$select=" portion of the OData query.
      *
-     * @param Builder $query
-     * @param array   $properties
+     * @param array $properties
      *
      * @return string|null
      */
@@ -217,12 +211,12 @@ class Grammar implements IGrammar
         // If the query is actually performing an aggregating select, we will let that
         // compiler handle the building of the select clauses, as it will need some
         // more syntax that is best handled by that function to keep things neat.
-        if (! is_null($query->count)) {
+        if (null !== $query->count) {
             return;
         }
 
         $select = '';
-        if (! empty($properties)) {
+        if (!empty($properties)) {
             $select = $this->appendQueryParam('$select=') . $this->columnize($properties);
         }
 
@@ -232,14 +226,13 @@ class Grammar implements IGrammar
     /**
      * Compile the "expand" portions of the query.
      *
-     * @param Builder  $query
-     * @param array    $expands
+     * @param array $expands
      *
      * @return string
      */
     protected function compileExpands(Builder $query, $expands)
     {
-        if (! empty($expands)) {
+        if (!empty($expands)) {
             return $this->appendQueryParam('$expand=') . implode(',', $expands);
         }
 
@@ -249,8 +242,6 @@ class Grammar implements IGrammar
     /**
      * Compile the "where" portions of the query.
      *
-     * @param Builder $query
-     *
      * @return string
      */
     protected function compileWheres(Builder $query)
@@ -258,7 +249,7 @@ class Grammar implements IGrammar
         // Each type of where clauses has its own compiler function which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
         // and maintainable since each clause has a very small method that it uses.
-        if (is_null($query->wheres)) {
+        if (null === $query->wheres) {
             return '';
         }
 
@@ -282,7 +273,7 @@ class Grammar implements IGrammar
     protected function compileWheresToArray($query)
     {
         return collect($query->wheres)->map(function ($where) use ($query) {
-            return $where['boolean'].' '.$this->{"where{$where['type']}"}($query, $where);
+            return $where['boolean'] . ' ' . $this->{"where{$where['type']}"}($query, $where);
         })->all();
     }
 
@@ -305,51 +296,53 @@ class Grammar implements IGrammar
     /**
      * Compile a basic where clause.
      *
-     * @param Builder $query
-     * @param array   $where
+     * @param array $where
      *
      * @return string
      */
     protected function whereBasic(Builder $query, $where)
     {
         $value = $this->prepareValue($where['value']);
-        return $where['column'].' '.$this->getOperatorMapping($where['operator']).' '.$value;
+
+        return $where['column'] . ' ' . $this->getOperatorMapping($where['operator']) . ' ' . $value;
     }
 
     /**
      * Compile a "where function" clause.
      *
-     * @param  Builder  $query
-     * @param  array  $where
+     * @param array $where
+     *
      * @return string
      */
     protected function whereFunction(Builder $query, $where)
     {
         $value = $this->prepareValue($where['value']);
+
         return $where['operator'] . '(' . $where['column'] . ',' . $value . ')';
     }
 
     /**
-     * Determines if the value is a special primitive data type (similar syntax with enums)
+     * Determines if the value is a special primitive data type (similar syntax with enums).
      *
      * @param string $value
+     *
      * @return string
      */
-    protected function isSpecialPrimitiveDataType($value){
+    protected function isSpecialPrimitiveDataType($value)
+    {
         return preg_match("/^(binary|datetime|guid|time|datetimeoffset)(\'[\w\:\-\.]+\')$/i", $value);
     }
 
     /**
      * Compile the "order by" portions of the query.
      *
-     * @param Builder  $query
-     * @param array    $orders
+     * @param array $orders
      *
      * @return string
      */
     protected function compileOrders(Builder $query, $orders)
     {
-        if (! empty($orders)) {
+        if (!empty($orders)) {
             return $this->appendQueryParam('$orderby=') . implode(',', $this->compileOrdersToArray($query, $orders));
         }
 
@@ -359,16 +352,15 @@ class Grammar implements IGrammar
     /**
      * Compile the query orders to an array.
      *
-     * @param Builder $query
-     * @param array   $orders
+     * @param array $orders
      *
      * @return array
      */
     protected function compileOrdersToArray(Builder $query, $orders)
     {
         return array_map(function ($order) {
-            return ! isset($order['sql'])
-                        ? $order['column'].' '.$order['direction']
+            return !isset($order['sql'])
+                        ? $order['column'] . ' ' . $order['direction']
                         : $order['sql'];
         }, $orders);
     }
@@ -376,38 +368,36 @@ class Grammar implements IGrammar
     /**
      * Compile the "$top" portions of the query.
      *
-     * @param Builder $query
-     * @param int     $take
+     * @param int $take
      *
      * @return string
      */
     protected function compileTake(Builder $query, $take)
     {
         // If we have an entity key $top is redundant and invalid, so bail
-        if (! empty($query->entityKey)) {
+        if (!empty($query->entityKey)) {
             return '';
         }
-        return $this->appendQueryParam('$top=') . (int) $take;
+
+        return $this->appendQueryParam('$top=') . (int)$take;
     }
 
     /**
      * Compile the "$skip" portions of the query.
      *
-     * @param Builder $query
-     * @param int     $skip
+     * @param int $skip
      *
      * @return string
      */
     protected function compileSkip(Builder $query, $skip)
     {
-        return $this->appendQueryParam('$skip=') . (int) $skip;
+        return $this->appendQueryParam('$skip=') . (int)$skip;
     }
 
     /**
      * Compile the "$count" portions of the query.
      *
-     * @param Builder $query
-     * @param int     $totalCount
+     * @param int $totalCount
      *
      * @return string
      */
@@ -416,11 +406,12 @@ class Grammar implements IGrammar
         if (isset($query->entityKey)) {
             return '';
         }
+
         return $this->appendQueryParam('$count=true');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function columnize(array $properties)
     {
@@ -441,10 +432,11 @@ class Grammar implements IGrammar
         // }));
         $uri = '';
         foreach ($segments as $segment => $value) {
-            if ((string) $value !== '') {
-                $uri.= strpos($uri, '?$') ? '&' . $value : $value;
+            if ('' !== (string)$value) {
+                $uri .= strpos($uri, '?$') ? '&' . $value : $value;
             }
         }
+
         return $uri;
     }
 
@@ -461,7 +453,7 @@ class Grammar implements IGrammar
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getOperators()
     {
@@ -469,7 +461,7 @@ class Grammar implements IGrammar
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -477,7 +469,7 @@ class Grammar implements IGrammar
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getOperatorsAndFunctions()
     {
@@ -485,7 +477,7 @@ class Grammar implements IGrammar
     }
 
     /**
-     * Get the OData operator for the passed operator
+     * Get the OData operator for the passed operator.
      *
      * @param string $operator The passed operator
      *
@@ -496,11 +488,12 @@ class Grammar implements IGrammar
         if (array_key_exists($operator, $this->operatorMapping)) {
             return $this->operatorMapping[$operator];
         }
+
         return $operator;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function prepareValue($value)
     {
@@ -511,8 +504,8 @@ class Grammar implements IGrammar
         if (!preg_match("/^([\w]+\.)+([\w]+)(\'[\w]+\')$/", $value) && !$this->isSpecialPrimitiveDataType($value)) {
             // Check if the value is a string and NOT a date
             if (is_string($value) && !\DateTime::createFromFormat('Y-m-d\TH:i:sT', $value)) {
-                $value = "'".$value."'";
-            } else if(is_bool($value)){
+                $value = "'" . $value . "'";
+            } elseif (is_bool($value)) {
                 $value = $value ? 'true' : 'false';
             }
         }
@@ -521,7 +514,7 @@ class Grammar implements IGrammar
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function parameter($value)
     {
@@ -529,7 +522,7 @@ class Grammar implements IGrammar
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isExpression($value)
     {
@@ -537,7 +530,7 @@ class Grammar implements IGrammar
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getValue($expression)
     {
@@ -547,8 +540,7 @@ class Grammar implements IGrammar
     /**
      * Compile a nested where clause.
      *
-     * @param Builder $query
-     * @param array   $where
+     * @param array $where
      *
      * @return string
      */
@@ -559,15 +551,16 @@ class Grammar implements IGrammar
         // if it is a normal query we need to take the leading "$filter=" of queries.
         // $offset = $query instanceof JoinClause ? 3 : 6;
         $wheres = $this->compileWheres($where['query']);
-        $offset = (substr($wheres, 0, 1) === '&') ? 9 : 8;
-        return '('.substr($wheres, $offset).')';
+        $offset = ('&' === substr($wheres, 0, 1)) ? 9 : 8;
+
+        return '(' . substr($wheres, $offset) . ')';
     }
 
     /**
      * Compile a "where null" clause.
      *
-     * @param  Builder  $query
-     * @param  array  $where
+     * @param array $where
+     *
      * @return string
      */
     protected function whereNull(Builder $query, $where)
@@ -578,8 +571,8 @@ class Grammar implements IGrammar
     /**
      * Compile a "where not null" clause.
      *
-     * @param  Builder  $query
-     * @param  array  $where
+     * @param array $where
+     *
      * @return string
      */
     protected function whereNotNull(Builder $query, $where)
@@ -588,10 +581,7 @@ class Grammar implements IGrammar
     }
 
     /**
-     * Append query param to existing uri
-     *
-     * @param string $value
-     * @return mixed
+     * Append query param to existing uri.
      */
     private function appendQueryParam(string $value)
     {

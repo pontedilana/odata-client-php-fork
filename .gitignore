@@ -9,3 +9,5 @@ composer.lock
 Thumbs.db
 /tests/testConfig.json
 .vscode
+.php-cs-fixer.cache
+.phpunit.result.cache

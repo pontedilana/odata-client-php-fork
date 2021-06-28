@@ -5,7 +5,7 @@ namespace SaintSystems\OData\Query;
 class Processor implements IProcessor
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function processSelect(Builder $query, $results)
     {

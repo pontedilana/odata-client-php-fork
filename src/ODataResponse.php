@@ -1,18 +1,20 @@
-<?php 
+<?php
 /**
-* Copyright (c) Saint Systems, LLC.  All Rights Reserved.  
-* Licensed under the MIT License.  See License in the project root 
+* Copyright (c) Saint Systems, LLC.  All Rights Reserved.
+* Licensed under the MIT License.  See License in the project root
 * for license information.
-* 
+*
 * ODataResponse File
 * PHP version 7
 *
 * @category  Library
-* @package   SaintSystems.OData
+*
 * @copyright 2017 Saint Systems, LLC
 * @license   https://opensource.org/licenses/MIT MIT License
+*
 * @version   GIT: 0.1.0
-* @link      https://www.microsoft.com/en-us/OData365/
+*
+* @see      https://www.microsoft.com/en-us/OData365/
 */
 
 namespace SaintSystems\OData;
@@ -20,52 +22,54 @@ namespace SaintSystems\OData;
 use function json_decode;
 
 /**
- * Class ODataResponse
+ * Class ODataResponse.
  *
  * @category Library
- * @package  SaintSystems.OData
+ *
  * @license  https://opensource.org/licenses/MIT MIT License
  */
 class ODataResponse
 {
+    private object $request;
+
     /**
-    * The body of the response
-    *
-    * @var string
-    */
+     * The body of the response.
+     *
+     * @var string
+     */
     private $body;
 
     /**
-    * The body of the response, 
-    * decoded into an array
-    *
-    * @var array(string)
-    */
+     * The body of the response,
+     * decoded into an array.
+     *
+     * @var array(string)
+     */
     private $decodedBody;
 
     /**
-    * The headers of the response
-    *
-    * @var array(string)
-    */
+     * The headers of the response.
+     *
+     * @var array(string)
+     */
     private $headers;
 
     /**
-    * The status code of the response
-    *
-    * @var string
-    */
+     * The status code of the response.
+     *
+     * @var string
+     */
     private $httpStatusCode;
 
     /**
-    * Creates a new OData HTTP response entity
-    *
-    * @param object $request        The request
-    * @param string $body           The body of the response
-    * @param string $httpStatusCode The returned status code
-    * @param array  $headers        The returned headers
-    */
-    public function __construct($request, $body = null, $httpStatusCode = null, $headers = array())
+     * Creates a new OData HTTP response entity.
+     *
+     * @param object $request        The request
+     * @param string $body           The body of the response
+     * @param string $httpStatusCode The returned status code
+     * @param array  $headers        The returned headers
+     */
+    public function __construct($request, $body = null, $httpStatusCode = null, $headers = [])
     {
         $this->request = $request;
         $this->body = $body;
@@ -75,66 +79,67 @@ class ODataResponse
     }
 
     /**
-    * Decode the JSON response into an array
-    *
-    * @return array The decoded response
-    */
+     * Decode the JSON response into an array.
+     *
+     * @return array The decoded response
+     */
     private function decodeBody()
     {
         $decodedBody = json_decode($this->body, true);
-        if ($decodedBody === null) {
-            $decodedBody = array();
+        if (null === $decodedBody) {
+            $decodedBody = [];
         }
+
         return $decodedBody;
     }
 
     /**
-    * Get the decoded body of the HTTP response
-    *
-    * @return array The decoded body
-    */
+     * Get the decoded body of the HTTP response.
+     *
+     * @return array The decoded body
+     */
     public function getBody()
     {
         return $this->decodedBody;
     }
 
     /**
-    * Get the undecoded body of the HTTP response
-    *
-    * @return string The undecoded body
-    */
+     * Get the undecoded body of the HTTP response.
+     *
+     * @return string The undecoded body
+     */
     public function getRawBody()
     {
         return $this->body;
     }
 
     /**
-    * Get the status of the HTTP response
-    *
-    * @return string The HTTP status
-    */
+     * Get the status of the HTTP response.
+     *
+     * @return string The HTTP status
+     */
     public function getStatus()
     {
         return $this->httpStatusCode;
     }
 
     /**
-    * Get the headers of the response
-    *
-    * @return array The response headers
-    */
+     * Get the headers of the response.
+     *
+     * @return array The response headers
+     */
     public function getHeaders()
     {
         return $this->headers;
     }
 
     /**
-    * Converts the response JSON object to a OData SDK object
-    *
-    * @param mixed $returnType The type to convert the object(s) to
-    *
-    * @return array<object> object or array of objects of type $returnType
-    */
+     * Converts the response JSON object to a OData SDK object.
+     *
+     * @param mixed $returnType The type to convert the object(s) to
+     *
+     * @return array<object> object or array of objects of type $returnType
+     */
     public function getResponseAsObject($returnType): array
     {
         $class = $returnType;
@@ -149,12 +154,13 @@ class ODataResponse
                 array_key_exists(Constants::ODATA_CONTEXT, $result)
                 && str_ends_with($result[Constants::ODATA_CONTEXT], '#Edm.String')
             ) {
-                $odataValue = \json_decode($odataValue, true, 512, JSON_THROW_ON_ERROR);
+                $odataValue = \json_decode($odataValue, true, 512, \JSON_THROW_ON_ERROR);
             }
 
             foreach ($odataValue as $obj) {
                 $objArray[] = new $class($obj);
             }
+
             return $objArray;
         }
 
@@ -162,34 +168,37 @@ class ODataResponse
     }
 
     /**
-    * Gets the skip token of a response object from OData
-    *
-    * @return string skip token, if provided
-    */
+     * Gets the skip token of a response object from OData.
+     *
+     * @return string skip token, if provided
+     */
     public function getSkipToken()
     {
         if (array_key_exists(Constants::ODATA_NEXT_LINK, $this->getBody())) {
             $nextLink = $this->getBody()[Constants::ODATA_NEXT_LINK];
-            $url = explode("?", $nextLink)[1];
-            $url = explode("skiptoken=", $url);
+            $url = explode('?', $nextLink)[1];
+            $url = explode('skiptoken=', $url);
             if (count($url) > 1) {
                 return $url[1];
             }
+
             return null;
         }
+
         return null;
     }
 
     /**
-    * Gets the Id of response object (if set) from OData
-    *
-    * @return mixed id if this was an insert, if provided
-    */
+     * Gets the Id of response object (if set) from OData.
+     *
+     * @return mixed id if this was an insert, if provided
+     */
     public function getId()
     {
         if (array_key_exists(Constants::ODATA_ID, $this->getHeaders())) {
             return $this->getBody()[Constants::ODATA_ID];
         }
+
         return null;
     }
 }

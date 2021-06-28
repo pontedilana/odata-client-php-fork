@@ -11,35 +11,35 @@ use SaintSystems\OData\Exception\ODataException;
 class ODataRequest implements IODataRequest
 {
     /**
-     * The URL for the request
+     * The URL for the request.
      *
      * @var string
      */
     protected $requestUrl;
 
     /**
-     * The Guzzle client used to make the HTTP request
+     * The Guzzle client used to make the HTTP request.
      *
      * @var Client
      */
     protected $http;
 
     /**
-     * An array of headers to send with the request
+     * An array of headers to send with the request.
      *
      * @var array(string => string)
      */
     protected $headers;
 
     /**
-     * The body of the request (optional)
+     * The body of the request (optional).
      *
      * @var string
      */
     protected $requestBody;
 
     /**
-     * The type of request to make ("GET", "POST", etc.)
+     * The type of request to make ("GET", "POST", etc.).
      *
      * @var object
      */
@@ -47,21 +47,21 @@ class ODataRequest implements IODataRequest
 
     /**
      * True if the response should be returned as
-     * a stream
+     * a stream.
      *
      * @var bool
      */
     protected $returnsStream;
 
     /**
-     * The return type to cast the response as
+     * The return type to cast the response as.
      *
      * @var object
      */
     protected $returnType;
 
     /**
-     * The timeout, in seconds
+     * The timeout, in seconds.
      *
      * @var string
      */
@@ -73,7 +73,8 @@ class ODataRequest implements IODataRequest
     private $client;
 
     /**
-     * Constructs a new ODataRequest object
+     * Constructs a new ODataRequest object.
+     *
      * @param string       $method     The HTTP method to use, e.g. "GET" or "POST"
      * @param string       $requestUrl The URL for the OData request
      * @param IODataClient $client     The ODataClient used to make the request
@@ -100,7 +101,7 @@ class ODataRequest implements IODataRequest
     }
 
     /**
-     * Sets the return type of the response object
+     * Sets the return type of the response object.
      *
      * @param mixed $returnClass The object class to use
      *
@@ -108,18 +109,21 @@ class ODataRequest implements IODataRequest
      */
     public function setReturnType($returnClass)
     {
-        if (is_null($returnClass)) return $this;
+        if (null === $returnClass) {
+            return $this;
+        }
         $this->returnType = $returnClass;
-        if (strcasecmp($this->returnType, 'stream') == 0) {
-            $this->returnsStream  = true;
+        if (0 == strcasecmp($this->returnType, 'stream')) {
+            $this->returnsStream = true;
         } else {
             $this->returnsStream = false;
         }
+
         return $this;
     }
 
     /**
-     * Adds custom headers to the request
+     * Adds custom headers to the request.
      *
      * @param array $headers An array of custom headers
      *
@@ -128,11 +132,12 @@ class ODataRequest implements IODataRequest
     public function addHeaders($headers)
     {
         $this->headers = array_merge($this->headers, $headers);
+
         return $this;
     }
 
     /**
-     * Get the request headers
+     * Get the request headers.
      *
      * @return array of headers
      */
@@ -143,7 +148,7 @@ class ODataRequest implements IODataRequest
 
     /**
      * Attach a body to the request. Will JSON encode
-     * any SaintSystems\OData\Entity objects as well as arrays
+     * any SaintSystems\OData\Entity objects as well as arrays.
      *
      * @param mixed $obj The object to include in the request
      *
@@ -156,23 +161,24 @@ class ODataRequest implements IODataRequest
             $this->requestBody = $obj;
         }
         // JSON-encode the model object's property dictionary
-        else if (is_object($obj) && method_exists($obj, 'getProperties')) {
+        elseif (is_object($obj) && method_exists($obj, 'getProperties')) {
             $class = get_class($obj);
-            $class = explode("\\", $class);
+            $class = explode('\\', $class);
             $model = strtolower(end($class));
 
             $body = $this->flattenDictionary($obj->getProperties());
-            $this->requestBody = "{" . $model . ":" . json_encode($body) . "}";
+            $this->requestBody = '{' . $model . ':' . json_encode($body) . '}';
         }
         // By default, JSON-encode (i.e. arrays)
         else {
             $this->requestBody = json_encode($obj);
         }
+
         return $this;
     }
 
     /**
-     * Get the body of the request
+     * Get the body of the request.
      *
      * @return mixed request body of any type
      */
@@ -182,7 +188,7 @@ class ODataRequest implements IODataRequest
     }
 
     /**
-     * Sets the timeout limit of the HTTP request
+     * Sets the timeout limit of the HTTP request.
      *
      * @param string $timeout The timeout in ms
      *
@@ -191,21 +197,21 @@ class ODataRequest implements IODataRequest
     public function setTimeout($timeout)
     {
         $this->timeout = $timeout;
+
         return $this;
     }
 
     /**
-     * Executes the HTTP request using Guzzle
+     * Executes the HTTP request using Guzzle.
      *
      * @throws ODataException if response is invalid
      *
      * @return mixed object or array of objects
-     *         of class $returnType
+     *               of class $returnType
      */
     public function execute()
     {
-        if (empty($this->requestUrl))
-        {
+        if (empty($this->requestUrl)) {
             throw new ODataException(Constants::REQUEST_URL_MISSING);
         }
 
@@ -240,35 +246,35 @@ class ODataRequest implements IODataRequest
         // If no return type is specified, return DynamicsResponse
         $returnObj = $response;
 
-        $returnType = is_null($this->returnType) ? Entity::class : $this->returnType;
+        $returnType = null === $this->returnType ? Entity::class : $this->returnType;
 
         if ($returnType) {
             $returnObj = $response->getResponseAsObject($returnType);
         }
+
         return $returnObj;
     }
 
     /**
-     * Executes the HTTP request asynchronously using Guzzle
+     * Executes the HTTP request asynchronously using Guzzle.
      *
      * @param mixed $client The Http client to use in the request
      *
-     * @return mixed object or array of objects
-     *         of class $returnType
+     * @return mixed object or array of objects of class $returnType
      */
     public function executeAsync($client = null)
     {
-        if (is_null($client)) {
+        if (null === $client) {
             $client = $this->createHttpClient();
         }
 
-        $promise = $client->requestAsync(
+        return $client->requestAsync(
             $this->requestType,
             $this->getRequestUrl(),
             [
                 'body' => $this->requestBody,
                 'stream' => $this->returnsStream,
-                'timeout' => $this->timeout
+                'timeout' => $this->timeout,
             ]
         )->then(
             // On success, return the result/response
@@ -285,19 +291,20 @@ class ODataRequest implements IODataRequest
                         $this->returnType
                     );
                 }
+
                 return $returnObject;
             },
             // On fail, log the error and return null
             function ($reason) {
-                trigger_error("Async call failed: " . $reason->getMessage());
+                trigger_error('Async call failed: ' . $reason->getMessage());
+
                 return null;
             }
         );
-        return $promise;
     }
 
     /**
-     * Get a list of headers for the request
+     * Get a list of headers for the request.
      *
      * @return array The headers for the request
      */
@@ -318,6 +325,7 @@ class ODataRequest implements IODataRequest
                 RequestHeader::ACCEPT => ContentType::APPLICATION_JSON,
             ];
         }
+
         return $headers;
     }
 
@@ -336,16 +344,17 @@ class ODataRequest implements IODataRequest
     }
 
     /**
-     * Returns whether or not the request is an OData aggregate request ($count, etc.)
+     * Returns whether or not the request is an OData aggregate request ($count, etc.).
      */
     private function isAggregate()
     {
-        return strpos($this->requestUrl, '/$count') !== false;
+        return false !== strpos($this->requestUrl, '/$count');
     }
 
     /**
      * Adds all of the headers from the header collection to the request.
-     * @param \SaintSystems\OData\HttpRequestMessage $request The HttpRequestMessage representation of the request.
+     *
+     * @param \SaintSystems\OData\HttpRequestMessage $request the HttpRequestMessage representation of the request
      */
     private function addHeadersToRequest(HttpRequestMessage $request)
     {
@@ -355,27 +364,25 @@ class ODataRequest implements IODataRequest
     /**
      * Adds the authentication header to the request.
      *
-     * @param HttpRequestMessage $request The representation of the request.
-     *
-     * @return
+     * @param HttpRequestMessage $request the representation of the request
      */
     private function authenticateRequest(HttpRequestMessage $request)
     {
         $authenticationProvider = $this->client->getAuthenticationProvider();
-        if ( ! is_null($authenticationProvider) && is_callable($authenticationProvider)) {
+        if (null !== $authenticationProvider && is_callable($authenticationProvider)) {
             return $authenticationProvider($request);
         }
     }
 
     /**
-     * Flattens the property dictionaries into
-     * JSON-friendly arrays
+     * Flattens the property dictionaries into JSON-friendly arrays.
      *
      * @param mixed $obj the object to flatten
      *
      * @return array flattened object
      */
-    protected function flattenDictionary($obj) {
+    protected function flattenDictionary($obj)
+    {
         foreach ($obj as $arrayKey => $arrayValue) {
             if (method_exists($arrayValue, 'getProperties')) {
                 $data = $arrayValue->getProperties();
@@ -388,6 +395,7 @@ class ODataRequest implements IODataRequest
                 $obj[$arrayKey] = $newItem;
             }
         }
+
         return $obj;
     }
 }

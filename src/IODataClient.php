@@ -9,24 +9,27 @@ interface IODataClient
 {
     /**
      * Gets the IAuthenticationProvider for authenticating HTTP requests.
+     *
      * @var \SaintSystems\OData\IAuthenticationProvider
      */
     public function getAuthenticationProvider();
 
     /**
      * Gets the base URL for requests of the client.
+     *
      * @var string
      */
     public function getBaseUrl();
 
     /**
      * Gets the IHttpProvider for sending HTTP requests.
+     *
      * @var IHttpProvider
      */
     public function getHttpProvider();
 
     /**
-     * Begin a fluent query against an OData service
+     * Begin a fluent query against an OData service.
      *
      * @param string $entitySet
      *
@@ -35,7 +38,7 @@ interface IODataClient
     public function from($entitySet);
 
     /**
-     * Begin a fluent query against an odata service
+     * Begin a fluent query against an odata service.
      *
      * @param array $properties
      *
@@ -68,8 +71,6 @@ interface IODataClient
     /**
      * Set the query grammar used by the connection.
      *
-     * @param IGrammar $grammar
-     *
      * @return void
      */
     public function setQueryGrammar(IGrammar $grammar);
@@ -83,8 +84,6 @@ interface IODataClient
 
     /**
      * Set the query post processor used by the connection.
-     *
-     * @param IProcessor $processor
      *
      * @return void
      */

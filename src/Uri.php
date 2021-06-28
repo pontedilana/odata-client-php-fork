@@ -4,7 +4,7 @@ namespace SaintSystems\OData;
 
 class Uri
 {
-    const URI_PARTS = [
+    public const URI_PARTS = [
         'scheme',
         'host',
         'port',
@@ -12,7 +12,7 @@ class Uri
         'pass',
         'path',
         'query',
-        'fragment'
+        'fragment',
     ];
 
     public $scheme;
@@ -38,10 +38,12 @@ class Uri
      */
     public function __construct($uri = null)
     {
-        if ($uri == null) return;
+        if (null == $uri) {
+            return;
+        }
         $uriParsed = parse_url($uri);
         $this->parsed = $uriParsed;
-        foreach(self::URI_PARTS as $uriPart) {
+        foreach (self::URI_PARTS as $uriPart) {
             if (isset($uriParsed[$uriPart])) {
                 $this->$uriPart = $uriParsed[$uriPart];
             }

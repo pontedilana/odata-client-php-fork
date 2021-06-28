@@ -7,34 +7,35 @@ use GuzzleHttp\Client;
 class GuzzleHttpProvider implements IHttpProvider
 {
     /**
-    * The Guzzle client used to make the HTTP request
-    *
-    * @var Client
-    */
+     * The Guzzle client used to make the HTTP request.
+     *
+     * @var Client
+     */
     protected $http;
 
     /**
-    * The timeout, in seconds
-    *
-    * @var string
-    */
+     * The timeout, in seconds.
+     *
+     * @var string
+     */
     protected $timeout;
 
     protected $extra_options;
 
     /**
-     * Creates a new HttpProvider
+     * Creates a new HttpProvider.
      */
     public function __construct()
     {
         $this->http = new Client();
         $this->timeout = 0;
-        $this->extra_options = array();
+        $this->extra_options = [];
     }
 
     /**
-     * Gets the timeout limit of the cURL request
-     * @return integer  The timeout in ms
+     * Gets the timeout limit of the cURL request.
+     *
+     * @return int The timeout in ms
      */
     public function getTimeout()
     {
@@ -42,15 +43,16 @@ class GuzzleHttpProvider implements IHttpProvider
     }
 
     /**
-     * Sets the timeout limit of the cURL request
+     * Sets the timeout limit of the cURL request.
      *
-     * @param integer $timeout The timeout in ms
+     * @param int $timeout The timeout in ms
      *
      * @return $this
      */
     public function setTimeout($timeout)
     {
         $this->timeout = $timeout;
+
         return $this;
     }
 
@@ -60,27 +62,24 @@ class GuzzleHttpProvider implements IHttpProvider
     }
 
     /**
-    * Executes the HTTP request using Guzzle
-    *
-    * @param HttpRequestMessage $request
-    *
-    * @return mixed object or array of objects
-    *         of class $returnType
-    */
+     * Executes the HTTP request using Guzzle.
+     *
+     * @return mixed object or array of objects
+     *               of class $returnType
+     */
     public function send(HttpRequestMessage $request)
     {
         $options = [
             'headers' => $request->headers,
-            'stream' =>  $request->returnsStream,
-            'timeout' => $this->timeout
+            'stream' => $request->returnsStream,
+            'timeout' => $this->timeout,
         ];
 
-        foreach ($this->extra_options as $key => $value)
-        {
+        foreach ($this->extra_options as $key => $value) {
             $options[$key] = $value;
         }
 
-        if ($request->method == HttpMethod::POST || $request->method == HttpMethod::PUT || $request->method == HttpMethod::PATCH) {
+        if (HttpMethod::POST == $request->method || HttpMethod::PUT == $request->method || HttpMethod::PATCH == $request->method) {
             $options['body'] = $request->body;
         }
 

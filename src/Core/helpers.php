@@ -41,7 +41,6 @@ if (!defined('HTTP_URL_STRIP_ALL')) {
 }
 
 if (!function_exists('http_build_url')) {
-
     /**
      * Build a URL.
      *
@@ -55,17 +54,16 @@ if (!function_exists('http_build_url')) {
      *                       HTTP_URL_REPLACE is the default
      * @param array $new_url if set, it will be filled with the parts of the
      *                       composed url like parse_url() would return
-     * @return string
      */
-    function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, &$new_url = array())
+    function http_build_url($url, $parts = [], $flags = HTTP_URL_REPLACE, &$new_url = []): string
     {
         is_array($url) || $url = parse_url($url);
         is_array($parts) || $parts = parse_url($parts);
 
-        isset($url['query']) && is_string($url['query']) || $url['query'] = null;
-        isset($parts['query']) && is_string($parts['query']) || $parts['query'] = null;
+        (isset($url['query']) && is_string($url['query'])) || $url['query'] = null;
+        (isset($parts['query']) && is_string($parts['query'])) || $parts['query'] = null;
 
-        $keys = array('user', 'pass', 'port', 'path', 'query', 'fragment');
+        $keys = ['user', 'pass', 'port', 'path', 'query', 'fragment'];
 
         // HTTP_URL_STRIP_ALL and HTTP_URL_STRIP_AUTH cover several other flags.
         if ($flags & HTTP_URL_STRIP_ALL) {
@@ -77,7 +75,7 @@ if (!function_exists('http_build_url')) {
         }
 
         // Schema and host are alwasy replaced
-        foreach (array('scheme', 'host') as $part) {
+        foreach (['scheme', 'host'] as $part) {
             if (isset($parts[$part])) {
                 $url[$part] = $parts[$part];
             }
@@ -91,7 +89,7 @@ if (!function_exists('http_build_url')) {
             }
         } else {
             if (isset($parts['path']) && ($flags & HTTP_URL_JOIN_PATH)) {
-                if (isset($url['path']) && substr($parts['path'], 0, 1) !== '/') {
+                if (isset($url['path']) && 0 !== strpos($parts['path'], '/')) {
                     // Workaround for trailing slashes
                     $url['path'] .= 'a';
                     $url['path'] = rtrim(
@@ -120,7 +118,7 @@ if (!function_exists('http_build_url')) {
             }
         }
 
-        if (isset($url['path']) && $url['path'] !== '' && substr($url['path'], 0, 1) !== '/') {
+        if (isset($url['path']) && '' !== $url['path'] && 0 !== strpos($url['path'], '/')) {
             $url['path'] = '/' . $url['path'];
         }
 
@@ -176,6 +174,6 @@ if (!function_exists('http_build_url')) {
 if (!function_exists('is_uuid')) {
     function is_uuid($uuid)
     {
-        return preg_match('/^[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}$/i', $uuid) == 1;
+        return 1 == preg_match('/^[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}$/i', $uuid);
     }
 }
