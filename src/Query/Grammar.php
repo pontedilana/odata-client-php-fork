@@ -184,8 +184,12 @@ class Grammar implements IGrammar
      */
     protected function wrapKey($entityKey)
     {
-        if (is_uuid($entityKey) || is_int($entityKey)) {
+        if (is_int($entityKey) || is_uuid($entityKey)) {
             return $entityKey;
+        }
+
+        if (is_bool($entityKey)) {
+            return $entityKey ? 'true' : 'false';
         }
 
         return "'$entityKey'";
