@@ -206,8 +206,7 @@ class ODataRequest implements IODataRequest
      *
      * @throws ODataException if response is invalid
      *
-     * @return mixed object or array of objects
-     *               of class $returnType
+     * @return mixed object or array of objects of class $returnType
      */
     public function execute()
     {
@@ -220,6 +219,7 @@ class ODataRequest implements IODataRequest
 
         $this->authenticateRequest($request);
 
+        /** @var \GuzzleHttp\Psr7\Response $result */
         $result = $this->client->getHttpProvider()->send($request);
 
         //Send back the bare response

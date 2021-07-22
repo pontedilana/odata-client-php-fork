@@ -127,7 +127,7 @@ class Grammar implements IGrammar
     /**
      * Compile the entity key portion of the query.
      *
-     * @param string $entityKey
+     * @param string|array $entityKey
      *
      * @return string
      */
@@ -178,6 +178,10 @@ class Grammar implements IGrammar
         return '';
     }
 
+    /**
+     * @param int|bool|string $entityKey
+     * @return int|string
+     */
     protected function wrapKey($entityKey)
     {
         if (is_uuid($entityKey) || is_int($entityKey)) {

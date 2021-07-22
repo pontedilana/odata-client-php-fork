@@ -257,7 +257,7 @@ class ODataClient implements IODataClient
      * @param string $method
      * @param string $requestUri
      *
-     * @return IODataRequest
+     * @return ODataResponse
      *
      * @throws ODataException
      */
