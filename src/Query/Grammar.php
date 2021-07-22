@@ -140,7 +140,7 @@ class Grammar implements IGrammar
         if (is_array($entityKey)) {
             $entityKey = $this->compileCompositeEntityKey($entityKey);
         } else {
-            $entityKey = $this->wrapKey($entityKey);
+            $entityKey = (string)$this->wrapKey($entityKey);
         }
 
         return "($entityKey)";
